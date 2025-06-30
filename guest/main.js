@@ -19,6 +19,98 @@ const guests = [
     "Hugo:4740", "Ines:3691", "Jason:5462", "Kelsey:3208", "Leon:9801",
     "Mila:1934", "Nikolai:8856", "Opal:3643", "Phoebe:9038", "Reed:7112",
     "Sara:2568", "Trent:1610", "Umar:3857", "Violet:5794", "Wyatt:6992"
-]
+];
+
 const admitted = []
 const refused = []
+
+function searchGuest(name) {
+    const available = guests.filter(guest => {
+        const guestName = guest.split(':')[0];
+        return !admitted.includes(guest) && !refused.includes(guest);
+    });
+    
+    const found = available.find(guest => {
+        const guestName = guest.split(':')[0];
+        return guestName.toLowerCase() === name.toLowerCase();
+    });
+    
+    return found;
+}
+
+function displayResult(name) {
+    const presentation = document.getElementById('presentation');
+    const found = searchGuest(name);
+    
+    if (found) {
+        const [guestName, tag] = found.split(':');
+        presentation.innerHTML = `
+            L'invité ${guestName} a été trouvé. Son tag est ${tag}.
+            <button onclick="admit('${found}')">Admit</button>
+            <button onclick="refuse('${found}')">Refuse</button>
+        `;
+    } else {
+        presentation.innerHTML = `L'invité ${name} n'a pas été trouvé.`;
+    }
+}
+
+function admit(guest) {
+    admitted.push(guest);
+    updateAdmitted();
+    clearResult();
+}
+
+function refuse(guest) {
+    refused.push(guest);
+    updateRefused();
+    clearResult();
+}
+
+function updateAdmitted() {
+    const element = document.querySelector('.admitted');
+    if (admitted.length > 0) {
+        const names = admitted.map(guest => guest.split(':')[0]).join(', ');
+        element.textContent = `Admit: ${names}`;
+    } else {
+        element.textContent = 'Admit: ';
+    }
+}
+
+function updateRefused() {
+    const element = document.querySelector('.refused');
+    if (refused.length > 0) {
+        const names = refused.map(guest => guest.split(':')[0]).join(', ');
+        element.textContent = `Refuse: ${names}`;
+    } else {
+        element.textContent = 'Refuse: ';
+    }
+}
+
+function clearResult() {
+    const presentation = document.getElementById('presentation');
+    presentation.innerHTML = '';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('search');
+    const button = document.querySelector('button');
+    
+    button.addEventListener('click', function() {
+        const name = input.value.trim();
+        if (name) {
+            displayResult(name);
+        }
+    });
+    
+    input.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            const name = input.value.trim();
+            if (name) {
+                displayResult(name);
+            }
+        }
+    });
+    
+    updateAdmitted();
+    updateRefused();
+});
