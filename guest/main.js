@@ -20,5 +20,59 @@ const guests = [
     "Mila:1934", "Nikolai:8856", "Opal:3643", "Phoebe:9038", "Reed:7112",
     "Sara:2568", "Trent:1610", "Umar:3857", "Violet:5794", "Wyatt:6992"
 ]
-const admitted = []
-const refused = []
+const admitted = [];
+const refused = [];
+let remainingGuests = guests.slice();
+
+window.addEventListener("DOMContentLoaded", () => {
+  const search = document.getElementById("search");
+  const button = document.querySelector("button");
+  const presentation = document.getElementById("presentation");
+  const admittedtab = document.querySelector(".admitted");
+  const refusedtab = document.querySelector(".refused");
+
+  button.addEventListener("click", () => {
+    const query = search.value.trim().toLowerCase();
+    presentation.innerHTML = "";
+
+    const trouver = remainingGuests.find(entry => { 
+        const [name] = entry.split(":");
+      return name.toLowerCase() === query;
+    });
+
+    if (trouver) {
+      const [name, tag] = trouver.split(":");
+      presentation.textContent = `L'invité ${name} est bien présent de le tableau guests, son tag est ${tag}. `;
+
+      const admitBtn = document.createElement("button");
+      admitBtn.textContent = "Admettre";
+      admitBtn.addEventListener("click", () => {
+        admitted.push(name);
+        admittedtab.textContent += ` ${name} (${tag})`;
+        removeGuest(trouver);
+        presentation.textContent = "";
+      });
+
+      const refuseBtn = document.createElement("button");
+      refuseBtn.textContent = "Refuser";
+      refuseBtn.addEventListener("click", () => {
+        refused.push(name);
+        refusedtab.textContent += ` ${name} (${tag})`;
+        removeGuest(trouver);
+        presentation.textContent = "";
+      });
+
+      presentation.appendChild(admitBtn);
+      presentation.appendChild(refuseBtn);
+    } else {
+      presentation.textContent = `L'invité ${search.value} n'est pas présent dans le tableau guests.`;
+    }
+  });
+
+  function removeGuest(entry) {
+    const index = remainingGuests.indexOf(entry);
+    if (index !== -1) {
+      remainingGuests.splice(index, 1);
+    }
+  }
+});
