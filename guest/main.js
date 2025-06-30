@@ -22,3 +22,71 @@ const guests = [
 ]
 const admitted = []
 const refused = []
+
+const searchInput = document.getElementById('search');
+const SearchButton = document.querySelector('button');
+const presentation = document.getElementById('presentation');
+const admittedList = document.querySelector('.admitted');
+const refusedList = document.querySelector('.refused');
+
+function UpdateLists() {
+    admittedList.textContent = 'Admit: ' + admitted.join(', ');
+    refusedList.textContent = 'Refuse: ' + refused.join(', ');
+}
+
+SearchButton.addEventListener('click', function() {
+    const searchName = searchInput.value.trim().toLowerCase();
+    presentation.innerHTML = '';
+
+    if (searchName === '') {
+        return;
+    }
+    
+    let inviteFound = false;
+    let indexInvite = -1;
+
+    for (let i = 0; i < guests.length; i++) {
+        const currentInvite = guests[i];
+        const infosInvite = currentInvite.split(':');
+        const nameInvite = infosInvite[0];
+
+        if (nameInvite.toLowerCase() === searchName) {
+            indexInvite = i;
+            inviteFound = true;
+            break; 
+        }
+    }
+
+    if (inviteFound) {
+        const [name, tag] = guests[indexInvite].split(':');
+
+        presentation.textContent = `L'invité ${searchName} a été trouvé. Son tag est ${tag}. `;
+
+        const admitButton = document.createElement('button');
+        admitButton.textContent = 'Admettre';
+        presentation.appendChild(admitButton);
+
+        const refuseButton = document.createElement('button');
+        refuseButton.textContent = 'Refuser';
+        presentation.appendChild(refuseButton);
+
+        admitButton.addEventListener('click', function() {
+            const [inviteAdmis] = guests.splice(indexInvite, 1);
+            admitted.push(inviteAdmis.split(':')[0]);
+            UpdateLists();
+            presentation.innerHTML = '';
+            searchInput.value = '';
+        });
+
+        refuseButton.addEventListener('click', function() {
+            const [inviteRefuse] = guests.splice(indexInvite, 1);
+            refused.push(inviteRefuse.split(':')[0]);
+            UpdateLists();
+            presentation.innerHTML = '';
+            searchInput.value = '';
+        });
+
+    } else {
+        presentation.textContent = `L'invité ${searchInput.value} n'a pas été trouvé.`;
+    }
+});

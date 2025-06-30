@@ -1,4 +1,4 @@
-export const SPAAACE = {
+const SPAAACE = {
     "Terrestrial planets": [
       {
         "Name": "Mercury",
