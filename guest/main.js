@@ -22,3 +22,81 @@ const guests = [
 ]
 const admitted = []
 const refused = []
+
+let availableGuests = [...guests];
+
+function getGuestByName(name) {
+    const lowerName = name.trim().toLowerCase();
+    for (let entry of availableGuests){
+        const [guestName, tag] = entry.split(':');
+        if (guestName.toLowerCase() === lowerName) {
+            return {guestName, tag}
+        }
+    }
+    return null;
+}
+
+function updateAdmitted() {
+    const admittedUpdate = document.querySelector('.admitted');
+    admittedUpdate.textContent = "Admit: " + admitted.map(g => `${g.guestName} (${g.tag})`).join(", ");
+}
+
+function updateRefused() {
+    const refusedUpdate = document.querySelector('.refused');
+    refusedUpdate.textContent = "Refuse: " + refused.map(g => `${g.guestName} (${g.tag})`).join(", ");
+}
+
+function handleAdmit(guest){
+    admitted.push(guest);
+    availableGuests = availableGuests.filter(entry => !entry.startsWith(guest.guestName + ":")); 
+    updateAdmitted();
+    document.getElementById('presentation').textContent = "";
+}
+
+function handleRefused(guest){
+    refused.push(guest);
+    availableGuests = availableGuests.filter(entry => !entry.startsWith(guest.guestName + ":"));
+    updateRefused();
+    document.getElementById('presentation').textContent = "";
+}
+
+function showGuestResult(guest) {
+    const presentation = document.getElementById('presentation');
+    presentation.innerHTML = `L'invité ${guest.guestName} a été trouvé. Son tag est ${guest.tag}. `;
+
+    const admitBtn = document.createElement('button');
+    admitBtn.textContent = "Admettre";
+    admitBtn.onclick = () => handleAdmit(guest);
+
+    const refuseBtn = document.createElement('button');
+    refuseBtn.textContent = "Refuser";
+    refuseBtn.onclick = () => handleRefused(guest);
+
+    presentation.appendChild(admitBtn);
+    presentation.appendChild(refuseBtn);
+}
+
+function showNotFound(name) {
+    document.getElementById('presentation').textContent = `L'invité ${name} n'a pas été trouvé.`;
+}
+
+function handleSearch() {
+    const input = document.getElementById('search');
+    const name = input.value.trim();
+    if (!name) {
+        document.getElementById('presentation').textContent = "";
+        return;
+    }
+    const guest = getGuestByName(name);
+    if (guest) {
+        showGuestResult(guest, name);
+    } else {
+        showNotFound(name);
+    }
+}
+
+window.onload = function(){
+    document.querySelector('button').addEventListener('click', handleSearch);
+    updateAdmitted();
+    updateRefused();
+};
