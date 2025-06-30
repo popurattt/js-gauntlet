@@ -1,32 +1,70 @@
-const temp = Math.floor(Math.random() * 100)
-const weight = Math.floor(Math.random() * 100) + 50
+import { text, insertX, insertY, insertZ } from './text.js'
 
-const insertX = [
-"Willy the Goblin",
-"Big Daddy",
-"Father Christmas"
-]
-
-const insertY = [
-"the soup kitchen",
-"Disneyland",
-"the White House"
-]
-const insertZ = [
-"spontaneously combusted",
-"melted into a puddle on the sidewalk",
-"turned into a slug and crawled away"
-]
+const content = document.getElementById('content')
+const button = document.getElementById('generate')
+const nameInput = document.getElementById('name')
+const frCheckbox = document.getElementById('fr')
 
 const units = {
-    fr: {
-        temp: "CELCIUS",
-        weight: "KG",
-    },
-    uk: {
-        temp: "FAHRENHEIT",
-        weight: "POUNDS",
-    }
+  fr: {
+    temp: "Celsius",
+    weight: "kg"
+  },
+  uk: {
+    temp: "Fahrenheit",
+    weight: "pounds"
+  }
 }
 
-const story = `It was ${temp} :temp: outside, so :insertx: went for a walk. When they got to :inserty:, they stared in horror for a few moments, then :insertz:. Bob saw the whole thing, but was not surprised — :insertx: weighs ${weight} :weight:, and it was a hot day.`
+function randomValue(arr) {
+  return arr[Math.floor(Math.random() * arr.length)]
+}
+
+function convertToCelsius(f) {
+  return Math.round((f - 32) * 5 / 9)
+}
+
+function convertToKg(pounds) {
+  return Math.round(pounds / 2.2046)
+}
+
+function generateStory() {
+  const tempF = Math.floor(Math.random() * 100)
+  const weightPounds = Math.floor(Math.random() * 100) + 50
+
+  const xItem = randomValue(insertX)
+  const yItem = randomValue(insertY)
+  const zItem = randomValue(insertZ)
+
+  let newStory = text
+    .replace(/:insertx:/g, xItem)
+    .replace(/:inserty:/g, yItem)
+    .replace(/:insertz:/g, zItem)
+
+  const customName = nameInput.value.trim()
+  if (customName !== "") {
+    newStory = newStory.replace("Bob", customName)
+  }
+
+  let temperature = tempF
+  let weight = weightPounds
+  let tempUnit = units.uk.temp
+  let weightUnit = units.uk.weight
+
+  if (frCheckbox.checked) {
+    temperature = convertToCelsius(tempF)
+    weight = convertToKg(weightPounds)
+    tempUnit = units.fr.temp
+    weightUnit = units.fr.weight
+  }
+
+  newStory = newStory
+    .replace(":temp:", tempUnit)
+    .replace(":weight:", weightUnit)
+    .replace(tempF, temperature)
+    .replace(weightPounds, weight)
+
+  content.textContent = newStory
+}
+
+button.addEventListener('click', generateStory)
