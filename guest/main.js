@@ -1,3 +1,4 @@
+window.addEventListener('DOMContentLoaded', function() {
 const guests = [
     "Alice:7483", "Bob:910", "Charlie:6478", "Diana:8491", "Ethan:3241",
     "Fiona:1390", "George:8733", "Hannah:4415", "Ivan:9685", "Julia:3507",
@@ -22,3 +23,126 @@ const guests = [
 ]
 const admitted = []
 const refused = []
+
+
+function parseGuest(str) {
+    const [name, tag] = str.split(":");
+    return { name, tag };
+}
+function getAvailableGuests() {
+    
+    return guests.filter(g =>
+        !admitted.includes(g) && !refused.includes(g)
+    );
+}
+function findGuestByName(name) {
+    const lower = name.trim().toLowerCase();
+    return getAvailableGuests().find(g => parseGuest(g).name.toLowerCase() === lower);
+}
+function findGuestByTagFragment(fragment) {
+    const frag = fragment.trim();
+    if (!frag) return [];
+    return getAvailableGuests()
+        .map(parseGuest)
+        .filter(g => g.tag.startsWith(frag))
+        .sort((a, b) => a.tag.localeCompare(b.tag));
+}
+
+
+const searchInput = document.getElementById('search');
+const searchBtn = document.querySelector('button');
+const presentation = document.getElementById('presentation');
+const admittedP = document.querySelector('.admitted');
+const refusedP = document.querySelector('.refused');
+
+
+let suggestionList = null;
+function ensureSuggestionList() {
+    if (!suggestionList) {
+        suggestionList = document.createElement('ul');
+        suggestionList.style.listStyle = 'none';
+        suggestionList.style.padding = '0';
+        suggestionList.style.margin = '0.5em 0';
+        suggestionList.id = 'suggestions';
+        searchInput.parentNode.insertBefore(suggestionList, presentation);
+    }
+    suggestionList.innerHTML = '';
+}
+
+
+function showResult() {
+    presentation.innerHTML = '';
+    ensureSuggestionList();
+    suggestionList.innerHTML = '';
+    const name = searchInput.value.trim();
+    if (!name) return;
+    const guestStr = findGuestByName(name);
+    if (guestStr) {
+        const { name: guestName, tag } = parseGuest(guestStr);
+        presentation.textContent = `L'invité ${guestName} a été trouvé. Son tag est ${tag}. `;
+        
+        const admitBtn = document.createElement('button');
+        admitBtn.textContent = 'Admettre';
+        admitBtn.onclick = () => {
+            admitted.push(guestStr);
+            updateAdmitted();
+            presentation.textContent = '';
+            searchInput.value = '';
+            suggestionList.innerHTML = '';
+        };
+        const refuseBtn = document.createElement('button');
+        refuseBtn.textContent = 'Refuser';
+        refuseBtn.onclick = () => {
+            refused.push(guestStr);
+            updateRefused();
+            presentation.textContent = '';
+            searchInput.value = '';
+            suggestionList.innerHTML = '';
+        };
+        presentation.appendChild(admitBtn);
+        presentation.appendChild(refuseBtn);
+    } else {
+        presentation.textContent = `L'invité ${name} n'a pas été trouvé.`;
+    }
+}
+
+
+function updateAdmitted() {
+    admittedP.textContent = 'Admit: ' + admitted.map(g => {
+        const { name, tag } = parseGuest(g);
+        return `${name} (${tag})`;
+    }).join(', ');
+}
+function updateRefused() {
+    refusedP.textContent = 'Refuse: ' + refused.map(g => {
+        const { name, tag } = parseGuest(g);
+        return `${name} (${tag})`;
+    }).join(', ');
+}
+
+
+function showSuggestions() {
+    ensureSuggestionList();
+    suggestionList.innerHTML = '';
+    const frag = searchInput.value.trim();
+    if (!frag) return;
+    const suggestions = findGuestByTagFragment(frag);
+    suggestions.forEach(g => {
+        const li = document.createElement('li');
+        li.style.cursor = 'pointer';
+        li.textContent = `${g.name} (${g.tag})`;
+        li.onclick = () => {
+            searchInput.value = g.name;
+            suggestionList.innerHTML = '';
+            showResult();
+        };
+        suggestionList.appendChild(li);
+    });
+}
+
+
+searchBtn.addEventListener('click', showResult);
+searchInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') showResult();
+});
+});
