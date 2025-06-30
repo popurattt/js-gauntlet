@@ -22,3 +22,26 @@ const guests = [
 ]
 const admitted = []
 const refused = []
+
+const search = document.getElementById('search');
+const searchButton = document.getElementById('button');
+const presentation = document.getElementById('presentation');
+
+searchButton.addEventListener('click', function () {
+  const inputName = search.value.trim().toLowerCase();
+  
+  let found = false;
+
+  for (let guest of guests) {
+    const [name, tag] = guest.split(':');
+    if (name.toLowerCase() === inputName) {
+      presentation.textContent = `L'invité ${name} a été trouvé. Son tag est ${tag}.`;
+      found = true;
+      break;
+    }
+  }
+
+  if (!found) {
+    presentation.textContent = `L'invité ${search.value} n'a pas été trouvé.`;
+  }
+});
