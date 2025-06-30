@@ -19,6 +19,60 @@ const guests = [
     "Hugo:4740", "Ines:3691", "Jason:5462", "Kelsey:3208", "Leon:9801",
     "Mila:1934", "Nikolai:8856", "Opal:3643", "Phoebe:9038", "Reed:7112",
     "Sara:2568", "Trent:1610", "Umar:3857", "Violet:5794", "Wyatt:6992"
-]
-const admitted = []
-const refused = []
+];
+const admitted = [];
+const refused = [];
+
+function updateStatus() {
+  document.querySelector(".admitted").textContent = "Admit: " + admitted.join(", ");
+  document.querySelector(".refused").textContent = "Refuse: " + refused.join(", ");
+}
+
+function createButton(label, onClick) {
+  const btn = document.createElement("button");
+  btn.textContent = label;
+  btn.addEventListener("click", onClick);
+  return btn;
+}
+
+function searchGuest(name) {
+  const presentation = document.getElementById("presentation");
+  presentation.innerHTML = "";
+
+  const index = guests.findIndex(entry => entry.split(":")[0].toLowerCase() === name.toLowerCase());
+
+  if (index === -1) {
+    presentation.textContent = `L'invité ${name} n'a pas été trouvé.`;
+    return;
+  }
+
+  const [guestName, tag] = guests[index].split(":");
+  const message = document.createElement("span");
+  message.textContent = `L'invité ${guestName} a été trouvé. Son tag est ${tag}. `;
+
+  const admitBtn = createButton("Admettre", () => {
+    admitted.push(`${guestName}:${tag}`);
+    guests.splice(index, 1);
+    updateStatus();
+    presentation.textContent = `L'invité ${guestName} a été admis.`;
+  });
+
+  const refuseBtn = createButton("Refuser", () => {
+    refused.push(`${guestName}:${tag}`);
+    guests.splice(index, 1);
+    updateStatus();
+    presentation.textContent = `L'invité ${guestName} a été refusé.`;
+  });
+
+  presentation.append(message, admitBtn, refuseBtn);
+}
+
+window.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("search");
+  const button = document.querySelector("button");
+
+  button.addEventListener("click", () => {
+    const name = input.value.trim();
+    if (name) searchGuest(name);
+  });
+});

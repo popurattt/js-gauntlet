@@ -78,5 +78,5 @@ Complétez `main.js` pour implémenter la génération d’histoires :
 - Si l’option **FR** est cochée :
   - Convertir les **unités de poids et de température américaines** en équivalents français.
 - Une **nouvelle histoire** doit être générée à chaque clic sur le bouton.
-
+- Quand je clique sur un, ça désactive l'autre
 ---
