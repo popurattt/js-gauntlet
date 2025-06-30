@@ -1,10 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en-US">
   <head>
     <meta charset="utf-8" />
-
     <title>Guessing game</title>
-
     <style>
       html {
         font-family: sans-serif;
@@ -19,6 +17,13 @@
         color: white;
         padding: 3px;
       }
+      .lowOrHi {
+        color: black; /* Pour que le texte soit visible */
+        font-weight: bold;
+      }
+      button {
+        margin-top: 10px;
+      }
     </style>
   </head>
 
@@ -31,11 +36,11 @@
       low.
     </p>
 
-    <div class="form">
+    <form class="form">
       <label for="guessField">Enter a guess: </label>
       <input type="text" id="guessField" class="guessField" />
       <input type="submit" value="Submit guess" class="guessSubmit" />
-    </div>
+    </form>
 
     <div class="resultParas">
       <p class="guesses"></p>
@@ -43,6 +48,6 @@
       <p class="lowOrHi"></p>
     </div>
 
-
+    <script src="script.js"></script>
   </body>
 </html>
