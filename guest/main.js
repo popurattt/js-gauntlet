@@ -19,6 +19,59 @@ const guests = [
     "Hugo:4740", "Ines:3691", "Jason:5462", "Kelsey:3208", "Leon:9801",
     "Mila:1934", "Nikolai:8856", "Opal:3643", "Phoebe:9038", "Reed:7112",
     "Sara:2568", "Trent:1610", "Umar:3857", "Violet:5794", "Wyatt:6992"
-]
-const admitted = []
-const refused = []
+];
+
+const admitted = [];
+const refused = [];
+
+const guestList = guests.map(g => {
+    const [name, tag] = g.split(":");
+    return { name, tag };
+});
+
+const searchInput = document.getElementById("search");
+const presentation = document.getElementById("presentation");
+const admitPara = document.getElementById("Admettre");
+const refusePara = document.getElementById("Refuser");
+
+function searchGuest() {
+    const searchValue = searchInput.value.trim().toLowerCase();
+
+    const foundGuest = guestList.find(g =>
+        g.name.toLowerCase() === searchValue &&
+        !admitted.includes(g.name) &&
+        !refused.includes(g.name)
+    );
+
+    presentation.innerHTML = "";
+
+    if (foundGuest) {
+        const message = document.createElement("span");
+        message.textContent = `L'invité ${foundGuest.name} a été trouvé. Son tag est ${foundGuest.tag}.`;
+        presentation.appendChild(message);
+
+        const admitButton = document.createElement("button");
+        admitButton.textContent = "Admettre";
+        admitButton.onclick = () => {
+            admitted.push(foundGuest.name);
+            admitPara.textContent += ` ${foundGuest.name} (${foundGuest.tag})`;
+            presentation.innerHTML = "";
+        };
+
+        const refuseButton = document.createElement("button");
+        refuseButton.textContent = "Refuser";
+        refuseButton.onclick = () => {
+            refused.push(foundGuest.name);
+            refusePara.textContent += ` ${foundGuest.name} (${foundGuest.tag})`;
+            presentation.innerHTML = "";
+        };
+
+        presentation.appendChild(document.createElement("br"));
+        presentation.appendChild(admitButton);
+        presentation.appendChild(refuseButton);
+    } else {
+        presentation.textContent = `L'invité ${searchInput.value} n'a pas été trouvé.`;
+    }
+}
+
+document.getElementById("searchButton").addEventListener("click", searchGuest);
