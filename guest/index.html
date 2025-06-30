@@ -1,20 +1,64 @@
 <!DOCTYPE html>
-<html lang="en-US">
+<html lang="fr">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width">
-    <script src="main.js"></script>
-    <title>Contact search </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système de Gestion des Invités</title>
+    <script src="https://cdn.tailwindcss.com"></script>
   </head>
-  <body>
-
-  <label for="search">Search by contact name: </label>
-  <input id="search" type="text">
-  <button>Search</button>
-  <p id="presentation"></p>
-  
-  <p class="admitted">Admit: </p>
-  <p class="refused">Refuse: </p>
-  
+  <body class="bg-gray-100 min-h-screen p-4">
+    <div class="max-w-md mx-auto bg-white rounded-lg shadow-md p-6 mt-8">
+      <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">
+        Gestion des Invités
+      </h1>
+      
+      <div class="bg-blue-50 p-3 rounded mb-4 text-sm text-blue-800">
+        <strong>Instructions :</strong><br>
+        • Entrez un nom pour rechercher<br>
+        • Entrez "nom:code" pour vérifier l'accès
+      </div>
+      
+      <div class="mb-4">
+        <label for="search" class="block text-sm font-medium text-gray-700 mb-2">
+          Rechercher :
+        </label>
+        <div class="flex gap-2">
+          <input 
+            id="search" 
+            type="text" 
+            placeholder="Ex: Alice ou Alice:7483"
+            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+          <button class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+            OK
+          </button>
+        </div>
+        <div id="suggestions" class="mt-1 max-h-32 overflow-y-auto border border-gray-200 rounded-md hidden"></div>
+      </div>
+      
+      <div id="presentation" class="text-center py-3 text-gray-700 font-medium"></div>
+      
+      <div id="actionButtons" class="hidden mb-4">
+        <div class="flex gap-2 justify-center">
+          <button id="acceptBtn" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">
+            ✅ Accepter
+          </button>
+          <button id="rejectBtn" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+            ❌ Refuser
+          </button>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 gap-4 mt-4">
+        <div class="bg-green-50 p-3 rounded border-l-4 border-green-500">
+          <p class="admitted text-sm font-medium text-green-800">✅ Admis : </p>
+        </div>
+        <div class="bg-red-50 p-3 rounded border-l-4 border-red-500">
+          <p class="refused text-sm font-medium text-red-800">❌ Refusés : </p>
+        </div>
+      </div>
+    </div>
+    
+    <script src="main.js"></script>
   </body>
 </html>

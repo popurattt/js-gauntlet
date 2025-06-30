@@ -19,6 +19,150 @@ const guests = [
     "Hugo:4740", "Ines:3691", "Jason:5462", "Kelsey:3208", "Leon:9801",
     "Mila:1934", "Nikolai:8856", "Opal:3643", "Phoebe:9038", "Reed:7112",
     "Sara:2568", "Trent:1610", "Umar:3857", "Violet:5794", "Wyatt:6992"
-]
-const admitted = []
-const refused = []
+];
+
+// Éléments DOM
+const [searchInput, searchButton, presentation, admittedList, refusedList, 
+    actionButtons, acceptButton, rejectButton, suggestionsDiv] = [
+    'search', 'button', 'presentation', '.admitted', '.refused',
+    'actionButtons', 'acceptBtn', 'rejectBtn', 'suggestions'
+].map(id => document.querySelector(id.includes('.') ? id : `#${id}`));
+
+let admitted = [], refused = [], currentGuest = null;
+
+/**
+ * Recherche un invité par nom ou vérifie l'accès avec code
+ * @param {string} name - Nom à rechercher
+ * @param {string} [code] - Code d'accès optionnel
+ * @returns {string|null} Invité trouvé ou null
+ */
+const findGuest = (name, code) => code 
+    ? guests.find(g => {
+        const [guestName, guestCode] = g.split(':');
+        return guestName.toLowerCase() === name.toLowerCase() && guestCode === code;
+    })?.split(':')[0]
+    : guests.find(g => g.split(':')[0].toLowerCase().includes(name.toLowerCase()));
+
+/**
+ * Met à jour l'affichage des listes
+ */
+const displayResults = () => {
+    admittedList.innerHTML = '✅ Admis : ' + (admitted.length ? admitted.join(', ') : 'Aucun');
+    refusedList.innerHTML = '❌ Refusés : ' + (refused.length ? refused.join(', ') : 'Aucun');
+};
+
+/**
+ * Gère l'affichage des boutons d'action
+ * @param {string} [guestName] - Nom de l'invité ou undefined pour cacher
+ */
+const toggleActions = (guestName) => {
+    currentGuest = guestName;
+    actionButtons.classList.toggle('hidden', !guestName);
+};
+
+/**
+ * Affiche les suggestions d'invités
+ * @param {string} input - Texte saisi
+ */
+const showSuggestions = (input) => {
+    if (!input.length) return suggestionsDiv.classList.add('hidden');
+    
+    const filtered = guests
+        .map(g => g.split(':')[0])
+        .filter(name => name.toLowerCase().includes(input.toLowerCase()))
+        .sort();
+    
+    if (!filtered.length) return suggestionsDiv.classList.add('hidden');
+    
+    suggestionsDiv.innerHTML = filtered
+        .map(name => `<div class="suggestion px-3 py-1 hover:bg-gray-100 cursor-pointer">${name}</div>`)
+        .join('');
+    
+    suggestionsDiv.classList.remove('hidden');
+    suggestionsDiv.querySelectorAll('.suggestion').forEach(s => 
+        s.addEventListener('click', () => {
+            searchInput.value = s.textContent;
+            suggestionsDiv.classList.add('hidden');
+            handleSearch();
+        })
+    );
+};
+
+/**
+ * Gère la recherche et l'authentification
+ */
+const handleSearch = () => {
+    const input = searchInput.value.trim();
+    if (!input) {
+        presentation.textContent = 'Veuillez entrer un nom ou un nom:code';
+        return toggleActions();
+    }
+
+    const hasCode = input.includes(':');
+    const [name, code] = hasCode ? input.split(':') : [input];
+    const guestName = findGuest(name, code);
+    
+    if (hasCode) {
+        if (guestName) {
+            if (!admitted.includes(guestName)) {
+                admitted.push(guestName);
+                refused = refused.filter(g => g !== guestName);
+                presentation.textContent = `✅ ${guestName} a été admis avec succès!`;
+            } else {
+                presentation.textContent = `${guestName} est déjà admis.`;
+            }
+            toggleActions();
+        } else {
+            if (!refused.includes(name)) {
+                refused.push(name);
+                presentation.textContent = `❌ Accès refusé pour ${name}`;
+            } else {
+                presentation.textContent = `${name} a déjà été refusé.`;
+            }
+            toggleActions();
+        }
+    } else {
+        if (guestName) {
+            const [gName, gCode] = guests.find(g => g.split(':')[0] === guestName).split(':');
+            presentation.textContent = `Invité trouvé: ${gName} - Code: ${gCode}`;
+            toggleActions(guestName);
+        } else {
+            presentation.textContent = `Aucun invité trouvé pour "${input}"`;
+            toggleActions();
+        }
+    }
+    displayResults();
+};
+
+/**
+ * Accepte ou refuse l'invité courant
+ * @param {boolean} accept - true pour accepter, false pour refuser
+ */
+const processGuest = (accept) => {
+    if (!currentGuest) return;
+    
+    const list = accept ? admitted : refused;
+    const otherList = accept ? refused : admitted;
+    const emoji = accept ? '✅' : '❌';
+    const action = accept ? 'accepté' : 'refusé';
+    
+    if (!list.includes(currentGuest)) {
+        list.push(currentGuest);
+        otherList.splice(otherList.indexOf(currentGuest), 1);
+        presentation.textContent = `${emoji} ${currentGuest} a été ${action}!`;
+    } else {
+        presentation.textContent = `${currentGuest} est déjà ${action}.`;
+    }
+    toggleActions();
+    displayResults();
+};
+
+// Événements
+searchButton.addEventListener('click', handleSearch);
+searchInput.addEventListener('keypress', e => e.key === 'Enter' && handleSearch());
+searchInput.addEventListener('input', e => showSuggestions(e.target.value));
+acceptButton.addEventListener('click', () => processGuest(true));
+rejectButton.addEventListener('click', () => processGuest(false));
+
+displayResults();
+
