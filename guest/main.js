@@ -22,3 +22,51 @@ const guests = [
 ]
 const admitted = []
 const refused = []
+  
+  const guestsHandled = new Set();
+  
+  const input = document.getElementById("search");
+  const button = document.querySelector("button");
+  const presentation = document.getElementById("presentation");
+  const admittedPara = document.querySelector(".admitted");
+  const refusedPara = document.querySelector(".refused");
+  
+  button.addEventListener("click", () => {
+    const searchTerm = input.value.trim().toLowerCase();
+    presentation.innerHTML = "";
+  
+    const guestEntry = guests.find(entry => {
+      const [name] = entry.split(":");
+      return name.toLowerCase() === searchTerm && !guestsHandled.has(name);
+    });
+  
+    if (guestEntry) {
+      const [name, tag] = guestEntry.split(":");
+  
+      const message = document.createElement("p");
+      message.textContent = `L'invité ${name} a été trouvé. Son tag est ${tag}.`;
+      presentation.appendChild(message);
+  
+      const admitBtn = document.createElement("button");
+      admitBtn.textContent = "Admettre";
+      admitBtn.addEventListener("click", () => {
+        admittedPara.textContent += ` ${name} (${tag})`;
+        guestsHandled.add(name);
+        presentation.innerHTML = "";
+      });
+  
+      const refuseBtn = document.createElement("button");
+      refuseBtn.textContent = "Refuser";
+      refuseBtn.addEventListener("click", () => {
+        refusedPara.textContent += ` ${name} (${tag})`;
+        guestsHandled.add(name);
+        presentation.innerHTML = "";
+      });
+  
+      presentation.appendChild(admitBtn);
+      presentation.appendChild(refuseBtn);
+    } else {
+      presentation.textContent = `L'invité ${input.value} n'a pas été trouvé.`;
+    }
+  });
+  
