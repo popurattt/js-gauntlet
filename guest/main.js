@@ -22,3 +22,58 @@ const guests = [
 ]
 const admitted = []
 const refused = []
+
+document.addEventListener('DOMContentLoaded', function() {
+  const input = document.getElementById('search');
+  const button = document.querySelector('button');
+  const presentation = document.getElementById('presentation');
+  const admittedP = document.querySelector('.admitted');
+  const refusedP = document.querySelector('.refused');
+
+  function updateLists() {
+    admittedP.textContent = 'Admit: ' + admitted.map(g => `${g.name} (${g.tag})`).join(', ');
+    refusedP.textContent = 'Refuse: ' + refused.map(g => `${g.name} (${g.tag})`).join(', ');
+  }
+
+  function searchGuest() {
+    const query = input.value.trim().toLowerCase();
+    presentation.innerHTML = '';
+    if (!query) return;
+
+    const filteredGuests = guests.filter(g => {
+      const [name] = g.split(':');
+      return !admitted.some(a => a.name.toLowerCase() === name.toLowerCase()) &&
+             !refused.some(r => r.name.toLowerCase() === name.toLowerCase());
+    });
+
+    const found = filteredGuests.find(g => g.split(':')[0].toLowerCase() === query);
+
+    if (found) {
+        const [name, tag] = found.split(':');
+        presentation.innerHTML = `L'invité <b>${name}</b> a été trouvé. Son tag est <b>${tag}</b>. `;
+        const admitBtn = document.createElement('button');
+        admitBtn.textContent = 'Admettre';
+        admitBtn.onclick = function() {
+        admitted.push({name, tag});
+        presentation.innerHTML = '';
+        updateLists();
+        };
+        const refuseBtn = document.createElement('button');
+        refuseBtn.textContent = 'Refuser';
+        refuseBtn.onclick = function() {
+        refused.push({name, tag});
+        presentation.innerHTML = '';
+        updateLists();
+        };
+        presentation.appendChild(admitBtn);
+        presentation.appendChild(refuseBtn);
+    } else {
+        presentation.textContent = `L'invité ${input.value} n'a pas été trouvé.`;
+    }
+    }
+
+    button.addEventListener('click', searchGuest);
+    input.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') searchGuest();
+    });
+});
